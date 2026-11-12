@@ -1,0 +1,1 @@
+ LOG  RESULT window=402x874 windowInsets=t62 r0 b34 l0 content=402x200 at x0..402 safeEdges=0..402 sheetInsets=t0 r0 b0 l0 | N/A (no side inset)
