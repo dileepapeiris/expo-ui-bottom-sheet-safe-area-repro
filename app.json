@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "expo-ui-bottom-sheet-safe-area-repro",
+    "slug": "expo-ui-bottom-sheet-safe-area-repro",
+    "version": "1.0.0",
+    "scheme": "sheetsaferepro",
+    "newArchEnabled": true,
+    "ios": { "bundleIdentifier": "dev.dileepapeiris.sheetsaferepro" }
+  }
+}
