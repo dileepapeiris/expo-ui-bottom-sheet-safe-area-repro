@@ -23,24 +23,33 @@ function SheetContent({ window, windowInsets, onMeasure }) {
     setLayout(e.nativeEvent.layout);
     latest.current.layout = e.nativeEvent.layout;
   };
+  const viewRef = useRef(null);
   // Report once the layout and the inner provider's insets have settled (the provider first
-  // reports the window's insets, then the ones of the view inside the sheet).
+  // reports the window's insets, then the ones of the view inside the sheet). The content passes
+  // when it crosses the window's horizontal safe-area edge, i.e. it is not held back by the inset.
   useEffect(() => {
     const id = setTimeout(() => {
       const { layout: l, sheetInsets: si } = latest.current;
-      if (!l) return;
-      const short = Math.round(window.width - l.width);
-      const line =
-        `RESULT window=${Math.round(window.width)}x${Math.round(window.height)} ` +
-        `windowInsets=${fmt(windowInsets)} content=${Math.round(l.width)}x${Math.round(l.height)} ` +
-        `short=${short}pt sheetInsets=${fmt(si)} | ${short <= 1 ? 'PASS' : 'FAIL'}`;
-      console.log(line);
-      onMeasure(line);
+      if (!l || !viewRef.current) return;
+      viewRef.current.measureInWindow((x, y, w, h) => {
+        const right = Math.round(x + w);
+        const edgeLeft = Math.round(windowInsets.left);
+        const edgeRight = Math.round(window.width - windowInsets.right);
+        const crosses =
+          (windowInsets.right > 0 && right > edgeRight) || (windowInsets.left > 0 && Math.round(x) < edgeLeft);
+        const verdict = windowInsets.left === 0 && windowInsets.right === 0 ? 'N/A (no side inset)' : crosses ? 'PASS' : 'FAIL';
+        const line =
+          `RESULT window=${Math.round(window.width)}x${Math.round(window.height)} ` +
+          `windowInsets=${fmt(windowInsets)} content=${Math.round(w)}x${Math.round(h)} at x${Math.round(x)}..${right} ` +
+          `safeEdges=${edgeLeft}..${edgeRight} sheetInsets=${fmt(si)} | ${verdict}`;
+        console.log(line);
+        onMeasure(line);
+      });
     }, 3000);
     return () => clearTimeout(id);
   }, []);
   return (
-    <View style={styles.content} onLayout={onLayout}>
+    <View ref={viewRef} style={styles.content} onLayout={onLayout}>
       <Text style={styles.label}>Window width: {Math.round(window.width)}pt</Text>
       <Text style={styles.label}>Content width: {layout ? `${Math.round(layout.width)}pt` : '…'}</Text>
       <Text style={styles.label}>Insets in the sheet: {fmt(sheetInsets)}</Text>
