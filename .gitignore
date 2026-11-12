@@ -1,0 +1,7 @@
+node_modules/
+/ios/
+.expo/
+*.log
+media/frames-*/
+scripts/compose
+scripts/measure
