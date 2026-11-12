@@ -1,5 +1,7 @@
 // Measures the sheet and its red content in an end-frame screenshot.
 //   scripts/measure <png> <scale>
+// Finds the rows that contain the red content, takes the row through its middle, and reports the
+// horizontal extent of the red content, in points.
 import Foundation
 import CoreGraphics
 import ImageIO
@@ -21,4 +23,15 @@ func px(_ x: Int, _ y: Int) -> (Int, Int, Int) {
 }
 func isRed(_ p: (Int, Int, Int)) -> Bool { p.0 > 200 && p.1 < 150 && p.2 < 130 }
 func isBright(_ p: (Int, Int, Int)) -> Bool { p.0 > 225 && p.1 > 225 && p.2 > 225 }
-print("\(url.lastPathComponent): \(w)x\(h) px")
+var redRows: [Int] = []
+for y in 0..<h {
+  var count = 0
+  for x in 0..<w where isRed(px(x, y)) { count += 1 }
+  if count > w / 10 { redRows.append(y) }
+}
+guard let first = redRows.first, let last = redRows.last else { print("no red content found"); exit(1) }
+let y = (first + last) / 2
+var redMin = w, redMax = -1
+for x in 0..<w where isRed(px(x, y)) { redMin = min(redMin, x); redMax = max(redMax, x) }
+func pt(_ v: Int) -> String { String(format: "%.1f", Double(v) / scale) }
+print("\(url.lastPathComponent): window \(pt(w))x\(pt(h)) pt, row y=\(pt(y)) pt, content x=\(pt(redMin))..\(pt(redMax + 1)) (\(pt(redMax + 1 - redMin)) pt)")
