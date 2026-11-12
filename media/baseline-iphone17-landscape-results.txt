@@ -1,0 +1,1 @@
+ LOG  RESULT window=874x402 windowInsets=t0 r62 b20 l62 content=750x200 at x0..750 safeEdges=62..812 sheetInsets=t0 r0 b0 l0 | PASS
