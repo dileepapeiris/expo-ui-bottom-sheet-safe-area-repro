@@ -44,3 +44,7 @@ in `media/<run>.mp4`. Sheet and content widths come from `scripts/measure` on th
 The folded Duo matches the issue's numbers (window 466 pt, content 374 pt). The sheet is 450 pt
 wide (8 pt margins), so the content is 76 pt short of the sheet's trailing edge, the rail's 84 pt
 inset minus the margin.
+
+![Folded Duo, baseline and with the modifier](media/duo-before-after.png)
+
+![Folded Duo, baseline and with the modifier, side by side](media/duo-side-by-side.gif)
