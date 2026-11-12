@@ -48,3 +48,30 @@ inset minus the margin.
 ![Folded Duo, baseline and with the modifier](media/duo-before-after.png)
 
 ![Folded Duo, baseline and with the modifier, side by side](media/duo-side-by-side.gif)
+
+## What this says about the issue
+
+- The behavior is real and deterministic. SwiftUI applies the window's safe area inside the
+  sheet, and `BottomSheet.ios.tsx` gives the content `Group` a fixed modifier list with nothing
+  that clears it.
+- The modifier the issue proposes works: appended to the `Group`'s modifiers it makes the content
+  fill the sheet on the folded Duo. The change is JS only (`variants/`).
+- The issue's concern about landscape is also real. On a notched iPhone in landscape the sheet
+  is full width and the content is inset by 62 pt on each side; with the modifier the content
+  runs under the Dynamic Island. In both cases a `SafeAreaProvider` inside the sheet then reports
+  the insets (r76 on the Duo, l62 r62 in landscape), so an app can pad its own content the way it
+  does at the root. Without the modifier it reports zero and the padding is applied for it.
+- So the modifier is a behavior change, not a pure fix: apps that rely on the sheet insetting
+  their content for them would start drawing under the notch in landscape. An opt-in (a prop,
+  or the `modifiers` passthrough the issue suggests) avoids that; making it the default would
+  need a changelog note.
+
+## Variants
+
+- `scripts/apply-variant.sh baseline` restores the installed 58.0.28 file.
+- `scripts/apply-variant.sh ignore-horizontal` appends `ignoreSafeArea({ edges: 'horizontal' })`
+  to the content `Group`'s modifiers (`variants/BottomSheet.ios.ignore-horizontal.js`).
+- `scripts/orientation.sh landscape|portrait <udid>` pins the app's orientation and rebuilds,
+  since DeviceHub exposes no rotate command.
+
+The unfolded Duo was not run: DeviceHub (Xcode 27.2) exposes no fold control to scripts.
