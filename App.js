@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomSheet } from '@expo/ui/community/bottom-sheet';
+import { ignoreSafeArea } from '@expo/ui/swift-ui/modifiers';
 
 // Repro for expo/expo#53369: the community BottomSheet's content stops short of the sheet edge
 // when the window has a horizontal safe-area inset (iPhone Duo folded, side rail on the right).
@@ -9,6 +10,8 @@ import { BottomSheet } from '@expo/ui/community/bottom-sheet';
 // the window size, the window insets, the content size and the insets a SafeAreaProvider inside
 // the sheet reports for the hosted content.
 const AUTORUN = true;
+// Set by scripts/apply-variant.sh pr: pass the modifier through the prop the PR adds.
+const USE_MODIFIERS_PROP = false;
 
 function fmt(i) {
   return `t${Math.round(i.top)} r${Math.round(i.right)} b${Math.round(i.bottom)} l${Math.round(i.left)}`;
@@ -71,7 +74,11 @@ function Screen() {
       <Text>window {Math.round(window.width)}x{Math.round(window.height)} insets {fmt(windowInsets)}</Text>
       <Button title="Open sheet" onPress={() => setOpen(true)} />
       <Text style={styles.result}>{result}</Text>
-      <BottomSheet index={open ? 0 : -1} enablePanDownToClose onDismiss={() => setOpen(false)}>
+      <BottomSheet
+        index={open ? 0 : -1}
+        enablePanDownToClose
+        onDismiss={() => setOpen(false)}
+        modifiers={USE_MODIFIERS_PROP ? [ignoreSafeArea({ edges: 'horizontal' })] : undefined}>
         <SafeAreaProvider>
           <SheetContent window={window} windowInsets={windowInsets} onMeasure={setResult} />
         </SafeAreaProvider>
