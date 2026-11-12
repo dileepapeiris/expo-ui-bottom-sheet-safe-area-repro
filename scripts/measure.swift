@@ -1,7 +1,8 @@
 // Measures the sheet and its red content in an end-frame screenshot.
 //   scripts/measure <png> <scale>
 // Finds the rows that contain the red content, takes the row through its middle, and reports the
-// horizontal extent of the red content, in points.
+// horizontal extent of the sheet (the contiguous run of bright or red pixels around the content,
+// everything else is dimmed by the sheet's backdrop) and of the red content, in points.
 import Foundation
 import CoreGraphics
 import ImageIO
@@ -33,5 +34,10 @@ guard let first = redRows.first, let last = redRows.last else { print("no red co
 let y = (first + last) / 2
 var redMin = w, redMax = -1
 for x in 0..<w where isRed(px(x, y)) { redMin = min(redMin, x); redMax = max(redMax, x) }
+var sheetMin = redMin, sheetMax = redMax
+while sheetMin > 0, isBright(px(sheetMin - 1, y)) || isRed(px(sheetMin - 1, y)) { sheetMin -= 1 }
+while sheetMax < w - 1, isBright(px(sheetMax + 1, y)) || isRed(px(sheetMax + 1, y)) { sheetMax += 1 }
 func pt(_ v: Int) -> String { String(format: "%.1f", Double(v) / scale) }
-print("\(url.lastPathComponent): window \(pt(w))x\(pt(h)) pt, row y=\(pt(y)) pt, content x=\(pt(redMin))..\(pt(redMax + 1)) (\(pt(redMax + 1 - redMin)) pt)")
+let shortLeft = redMin - sheetMin, shortRight = sheetMax - redMax
+let verdict = (shortLeft <= Int(2 * scale) && shortRight <= Int(2 * scale)) ? "PASS" : "FAIL"
+print("\(url.lastPathComponent): window \(pt(w))x\(pt(h)) pt, row y=\(pt(y)) pt, sheet x=\(pt(sheetMin))..\(pt(sheetMax + 1)) (\(pt(sheetMax + 1 - sheetMin)) pt), content x=\(pt(redMin))..\(pt(redMax + 1)) (\(pt(redMax + 1 - redMin)) pt), gap left \(pt(shortLeft)) pt, gap right \(pt(shortRight)) pt | \(verdict)")
