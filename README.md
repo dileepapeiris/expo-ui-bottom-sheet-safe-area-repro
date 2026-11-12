@@ -37,6 +37,8 @@ scripts/measure media/baseline-duo-end.png 3
 | iPhone 17 landscape, baseline | 874 pt | 750 pt | 62 pt each side | l0 r0 |
 | iPhone 17 landscape, `ignoreSafeArea({ edges: 'horizontal' })` | 874 pt | 874 pt | 0 pt | l62 r62 |
 | iPhone 17 portrait, baseline (control) | 386 pt | 386 pt | none | none |
+| Duo folded, fix PR: `modifiers={[ignoreSafeArea({ edges: 'horizontal' })]}` | 450 pt | 450 pt | 0 pt | r76 b0 |
+| iPhone 17 landscape, fix PR: `modifiers={[ignoreSafeArea({ edges: 'horizontal' })]}` | 874 pt | 874 pt | 0 pt | l62 r62 |
 
 `RESULT` lines are in `media/<run>-results.txt`, end frames in `media/<run>-end.png`, recordings
 in `media/<run>.mp4`. Sheet and content widths come from `scripts/measure` on the end frames.
@@ -71,6 +73,8 @@ inset minus the margin.
 - `scripts/apply-variant.sh baseline` restores the installed 58.0.28 file.
 - `scripts/apply-variant.sh ignore-horizontal` appends `ignoreSafeArea({ edges: 'horizontal' })`
   to the content `Group`'s modifiers (`variants/BottomSheet.ios.ignore-horizontal.js`).
+- `scripts/apply-variant.sh pr` installs the installed file with the fix PR's `modifiers` prop applied
+  (`variants/BottomSheet.ios.pr.js`) and makes App.js pass the modifier through that prop.
 - `scripts/orientation.sh landscape|portrait <udid>` pins the app's orientation and rebuilds,
   since DeviceHub exposes no rotate command.
 
