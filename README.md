@@ -27,3 +27,20 @@ CI=1 npx expo start --port 8081 --clear
 DISPLAY_ARG=--display=1 scripts/record.sh <duo udid> baseline-duo   # omit DISPLAY_ARG on other devices
 scripts/measure media/baseline-duo-end.png 3
 ```
+
+## Runs
+
+| Run | Sheet | Content | Gap on the inset side | Insets inside the sheet |
+| --- | --- | --- | --- | --- |
+| Duo folded, baseline (the issue) | 450 pt | 374 pt | 76 pt | r0 b0 |
+| Duo folded, `ignoreSafeArea({ edges: 'horizontal' })` | 450 pt | 450 pt | 0 pt | r76 b0 |
+| iPhone 17 landscape, baseline | 874 pt | 750 pt | 62 pt each side | l0 r0 |
+| iPhone 17 landscape, `ignoreSafeArea({ edges: 'horizontal' })` | 874 pt | 874 pt | 0 pt | l62 r62 |
+| iPhone 17 portrait, baseline (control) | 386 pt | 386 pt | none | none |
+
+`RESULT` lines are in `media/<run>-results.txt`, end frames in `media/<run>-end.png`, recordings
+in `media/<run>.mp4`. Sheet and content widths come from `scripts/measure` on the end frames.
+
+The folded Duo matches the issue's numbers (window 466 pt, content 374 pt). The sheet is 450 pt
+wide (8 pt margins), so the content is 76 pt short of the sheet's trailing edge, the rail's 84 pt
+inset minus the margin.
