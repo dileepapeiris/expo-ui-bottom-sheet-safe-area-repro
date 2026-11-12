@@ -4,6 +4,8 @@ import { BottomSheet } from '@expo/ui/community/bottom-sheet';
 
 // Repro for expo/expo#53369: the community BottomSheet's content stops short of the sheet edge
 // when the window has a horizontal safe-area inset (iPhone Duo folded, side rail on the right).
+// With AUTORUN the sheet opens by itself 1.5 s after launch, so every run is recorded the same way.
+const AUTORUN = true;
 
 export default function App() {
   const [open, setOpen] = useState(false);
@@ -11,7 +13,9 @@ export default function App() {
   const window = useWindowDimensions();
 
   return (
-    <View style={styles.screen}>
+    <View
+      style={styles.screen}
+      onLayout={() => AUTORUN && !open && setTimeout(() => setOpen(true), 1500)}>
       <Text>window {Math.round(window.width)}x{Math.round(window.height)}</Text>
       <Button title="Open sheet" onPress={() => setOpen(true)} />
       <BottomSheet index={open ? 0 : -1} enablePanDownToClose onDismiss={() => setOpen(false)}>
